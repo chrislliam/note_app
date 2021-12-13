@@ -1,0 +1,46 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import '../../modules/edit_note/edit_note_page.dart';
+import '../../modules/home/home_page.dart';
+import '../../modules/login/login_page.dart';
+import '../../modules/register/register_page.dart';
+import '../../shared/repositories/database_service.dart';
+import '../repositories/shared_repository.dart';
+
+mixin Routes {
+  static String get initialRoute => RoutesConst.initial;
+
+  static Map<String, Widget Function(BuildContext, dynamic)> routes = {
+    RoutesConst.initial: (_, args) => HomePage(
+          repository: DatabaseService.instance,
+          sharedRepository: SharedRepository(),
+        ),
+    RoutesConst.login: (_, args) => LoginPage(),
+    RoutesConst.register: (_, args) => RegisterPage(),
+    RoutesConst.editNote: (_, args) => EditNotePage(
+          tuple: args,
+          repository: DatabaseService.instance,
+        ),
+  };
+  static Route? generateRoutes(RouteSettings settings) {
+    final routerName = settings.name;
+    final routerArgs = settings.arguments;
+
+    final navigateTo = routes[routerName];
+    if (navigateTo == null) return null;
+
+    return MaterialPageRoute(
+      builder: (context) => navigateTo.call(context, routerArgs),
+    );
+  }
+}
+
+class RoutesConst {
+  static const String initial = '/';
+  static const String splash = '/splash';
+  static const String login = '/login';
+  static const String register = '/register';
+  static const String home = '/home';
+  static const String editNote = '/editNote';
+  static const String editProfile = '/editProfile';
+}
