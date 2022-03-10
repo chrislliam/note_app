@@ -6,9 +6,6 @@ import 'shared/interfaces/theme_app_interface.dart';
 abstract class IAppStore extends ChangeNotifier {
   IAppStore(ISharedRepository sharedRepository);
 
-  bool get isLoading;
-  bool get hasError;
-  String get error;
   ThemeMode get themeMode;
   IThemeAppInterface get themeApp;
   Future<void> get switchTheme;
@@ -22,14 +19,6 @@ class AppStore extends ChangeNotifier implements IAppStore {
     loadThemeData;
   }
   bool isDark = false;
-  @override
-  String get error => throw UnimplementedError();
-
-  @override
-  bool get hasError => throw UnimplementedError();
-
-  @override
-  bool get isLoading => throw UnimplementedError();
 
   @override
   IThemeAppInterface themeApp = AppThemeFactory.getTheme(ThemeMode.light);

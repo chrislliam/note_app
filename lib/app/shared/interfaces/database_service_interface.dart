@@ -5,7 +5,7 @@ import '../model/note_model.dart';
 abstract class IDatabaseService {
   Future<Database> initDatabase();
   Future<void> createNote(NoteModel note);
-  Stream<List<NoteModel>?> fetchNote();
+  Future<List<NoteModel>?> fetchNote();
   Future<void> editNote(NoteModel note);
   Future<int> delete(int id);
   Future close();

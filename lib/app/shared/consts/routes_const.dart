@@ -1,11 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../modules/edit_note/edit_note_page.dart';
 import '../../modules/home/home_page.dart';
-import '../../modules/login/login_page.dart';
-import '../../modules/register/register_page.dart';
 import '../../shared/repositories/database_service.dart';
-import '../repositories/shared_repository.dart';
 
 mixin Routes {
   static String get initialRoute => RoutesConst.initial;
@@ -13,10 +9,7 @@ mixin Routes {
   static Map<String, Widget Function(BuildContext, dynamic)> routes = {
     RoutesConst.initial: (_, args) => HomePage(
           repository: DatabaseService.instance,
-          sharedRepository: SharedRepository(),
         ),
-    RoutesConst.login: (_, args) => LoginPage(),
-    RoutesConst.register: (_, args) => RegisterPage(),
     RoutesConst.editNote: (_, args) => EditNotePage(
           tuple: args,
           repository: DatabaseService.instance,

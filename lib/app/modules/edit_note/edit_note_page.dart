@@ -76,18 +76,14 @@ class _EditNotePageState extends State<EditNotePage> {
                 Text(widget.tuple.isEdit ? 'Editado' : 'Novo',
                     style: Theme.of(context).textTheme.subtitle1),
                 TextButton(
+                    child: Text('Salvo'),
                     onPressed: widget.tuple.isEdit
-                        ? () {
-                            store
-                                .editNote(widget.tuple.note!.id!)
-                                .then((_) => Navigator.pop(context));
-                          }
-                        : () {
-                            store
-                                .createNote()
-                                .then((_) => Navigator.pop(context));
-                          },
-                    child: Text('Salvo'))
+                        ? () => store
+                            .editNote(widget.tuple.note!.id!)
+                            .then((_) => Navigator.pop(context))
+                        : () => store
+                            .createNote()
+                            .then((_) => Navigator.pop(context)))
               ],
             )
           ],

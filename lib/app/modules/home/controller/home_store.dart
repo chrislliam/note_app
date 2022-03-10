@@ -7,7 +7,7 @@ abstract class IHomeStore extends ChangeNotifier {
   bool get isLoading;
   bool get hasError;
   String get error;
-  Stream<List<NoteModel>?> get fetchList;
+  Future<List<NoteModel>?> get fetchList;
   Future<void> deleteNote(int id);
 }
 
@@ -33,12 +33,14 @@ class HomeStore extends ChangeNotifier implements IHomeStore {
   String get error => _error;
 
   @override
-  Stream<List<NoteModel>?> get fetchList {
+  Future<List<NoteModel>?> get fetchList {
     try {
       _setIsLoading(value: true);
+      notifyListeners();
       return repository.fetchNote();
     } finally {
       _setIsLoading();
+      notifyListeners();
     }
   }
 
@@ -51,5 +53,6 @@ class HomeStore extends ChangeNotifier implements IHomeStore {
   @override
   Future<void> deleteNote(int id) async {
     await repository.delete(id).whenComplete(() => print('deletou'));
+    notifyListeners();
   }
 }

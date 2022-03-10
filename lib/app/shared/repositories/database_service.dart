@@ -1,6 +1,7 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../consts/const_string.dart';
 import '../interfaces/database_service_interface.dart';
 import '../model/note_model.dart';
 
@@ -10,7 +11,6 @@ class DatabaseService implements IDatabaseService {
 
   Database? _database;
 
-  final String _pathDoc = 'notes';
   Future<Database> get database async {
     if (_database != null) return _database!;
 
@@ -27,7 +27,7 @@ class DatabaseService implements IDatabaseService {
     return await openDatabase(dbLocal, version: 1,
         onCreate: (db, dbRecentVersion) {
       var sql =
-          'CREATE TABLE $_pathDoc (id $idType, title $textType, content $textType, lastAtt $textType, isMarked $boolType)';
+          'CREATE TABLE ${ConstString.pathDoc} (id $idType, title $textType, content $textType, lastAtt $textType, isMarked $boolType)';
       db.execute(sql);
     });
   }
@@ -35,19 +35,15 @@ class DatabaseService implements IDatabaseService {
   @override
   Future<void> createNote(NoteModel note) async {
     final db = await instance.database;
-    await db
-        .insert(_pathDoc, note.toMap(),
-            conflictAlgorithm: ConflictAlgorithm.replace)
-        .whenComplete(() {
-      print('Foi criado');
-    });
+    await db.insert(ConstString.pathDoc, note.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   @override
   Future<void> editNote(NoteModel note) async {
     final db = await instance.database;
     await db.update(
-      _pathDoc,
+      ConstString.pathDoc,
       note.toMap(),
       where: 'id = ?',
       whereArgs: [note.id],
@@ -58,19 +54,19 @@ class DatabaseService implements IDatabaseService {
   Future<int> delete(int id) async {
     final db = await instance.database;
     return await db.delete(
-      _pathDoc,
+      ConstString.pathDoc,
       where: 'id = ?',
       whereArgs: [id],
     );
   }
 
   @override
-  Stream<List<NoteModel>?> fetchNote() async* {
+  Future<List<NoteModel>?> fetchNote() async {
     final db = await instance.database;
     final orderBy = 'lastAtt ASC';
-    final result = await db.query(_pathDoc, orderBy: orderBy);
+    final result = await db.query(ConstString.pathDoc, orderBy: orderBy);
     final resultMap = result.map(NoteModel.fromDoc).toList();
-    yield resultMap;
+    return resultMap;
   }
 
   @override
