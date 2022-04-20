@@ -3,54 +3,38 @@ import 'package:flutter/foundation.dart';
 import '../../../shared/interfaces/database_service_interface.dart';
 import '../../../shared/model/note_model.dart';
 
-abstract class IHomeStore extends ChangeNotifier {
-  bool get isLoading;
-  bool get hasError;
-  String get error;
-  Future<List<NoteModel>?> get fetchList;
-  Future<void> deleteNote(int id);
+abstract class HomeState {}
+
+class Loading extends HomeState {}
+
+class Loaded extends HomeState {
+  final List<NoteModel>? list;
+
+  Loaded(this.list);
 }
 
-class HomeStore extends ChangeNotifier implements IHomeStore {
+class Error extends HomeState {
+  final String errorMessage;
+
+  Error(this.errorMessage);
+}
+
+class HomeStore extends ValueNotifier<HomeState> {
   final IDatabaseService repository;
 
-  HomeStore({required this.repository});
-  bool _isLoading = false;
+  HomeStore({required this.repository}) : super(Loading());
 
-  String _error = '';
-
-  void _setIsLoading({bool value = false}) {
-    _isLoading = value;
-    notifyListeners();
-  }
-
-  void _setError({String value = ''}) {
-    _error = value;
-    notifyListeners();
-  }
-
-  @override
-  String get error => _error;
-
-  @override
-  Future<List<NoteModel>?> get fetchList {
+  Future<void> fetchList() async {
+    value = Loading();
     try {
-      _setIsLoading(value: true);
-      notifyListeners();
-      return repository.fetchNote();
-    } finally {
-      _setIsLoading();
-      notifyListeners();
+      repository.fetchNote().then((list) {
+        value = Loaded(list);
+      });
+    } catch (e) {
+      value = Error(e.toString());
     }
   }
 
-  @override
-  bool get hasError => _error.isNotEmpty;
-
-  @override
-  bool get isLoading => _isLoading;
-
-  @override
   Future<void> deleteNote(int id) async {
     await repository.delete(id).whenComplete(() => print('deletou'));
     notifyListeners();
