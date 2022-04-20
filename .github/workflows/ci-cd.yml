@@ -13,7 +13,7 @@ on:
 jobs:
   flutter_test:
     name: Run Flutter analyze and test
-    runs-on: ubuntu-lastest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v1
@@ -36,3 +36,24 @@ jobs:
       - uses: VeryGoodOpenSource/very_good_coverage@v1.1.1
         with:
         min_covarage: 0
+    
+    build_appbundle:
+      name: Build Flutter (Android)
+      needs: [flutter_test]
+      runs-on: ubutun_latest
+      steps:
+        - uses: actions/checkout@v2
+        - uses: actions/setup-java@v1
+          with:
+            java-version: "12.x"
+        - uses: subosito/flutter-action@v1
+          with:
+          channel: "stable"
+        - run: flutter pub get
+        - run: flutter clean
+        - run: flutter build appbundle --release
+        - name: Upload appbundle
+        - uses: actions/upload-artifact@v2.1.4
+          with:
+            name: appbundle
+            path: build/app/outputs/bundle/release/app-release.aab

@@ -30,7 +30,8 @@ class HomeStore extends ValueNotifier<HomeState> {
       repository.fetchNote().then((list) {
         value = Loaded(list);
       });
-    } catch (e) {
+      notifyListeners();
+    } on Exception catch (e) {
       value = Error(e.toString());
     }
   }

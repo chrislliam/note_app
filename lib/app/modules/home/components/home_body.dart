@@ -17,15 +17,6 @@ class HomeBody extends StatefulWidget {
 
 class _HomeBodyState extends State<HomeBody> {
   @override
-  void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      widget.store.fetchList();
-    });
-
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<HomeState>(
         valueListenable: widget.store,
@@ -37,7 +28,7 @@ class _HomeBodyState extends State<HomeBody> {
               var valueError = value as Error;
               return HandleError(
                 error: valueError.errorMessage,
-                onRefresh: () => widget.store.fetchList,
+                onRefresh: () => widget.store.fetchList(),
               );
 
             case Loaded:
@@ -49,7 +40,7 @@ class _HomeBodyState extends State<HomeBody> {
                     children: [
                       Text('Lista vazia'),
                       IconButton(
-                          onPressed: () => widget.store.fetchList,
+                          onPressed: () => widget.store.fetchList(),
                           icon: Icon(Icons.refresh))
                     ],
                   ),
@@ -57,24 +48,21 @@ class _HomeBodyState extends State<HomeBody> {
               } else {
                 return Container(
                   margin: EdgeInsets.all(16),
-                  child: ListView.builder(
-                      itemCount: newValue.list!.length,
-                      itemBuilder: (_, index) {
-                        var note = newValue.list![index];
-                        return NoteCardWidget(
-                            note: note,
-                            edit: () async {
-                              await Navigator.pushNamed(
+                  child: RefreshIndicator(
+                    onRefresh: () => widget.store.fetchList(),
+                    child: ListView.builder(
+                        itemCount: newValue.list!.length,
+                        itemBuilder: (_, index) {
+                          var note = newValue.list![index];
+                          return NoteCardWidget(
+                              note: note,
+                              edit: () async => await Navigator.pushNamed(
                                   context, RoutesConst.editNote,
                                   arguments:
-                                      TupleNote(isEdit: true, note: note));
-                              setState(() {});
-                            },
-                            delete: () {
-                              widget.store.deleteNote(note.id!);
-                              setState(() {});
-                            });
-                      }),
+                                      TupleNote(isEdit: true, note: note)),
+                              delete: () => widget.store.deleteNote(note.id!));
+                        }),
+                  ),
                 );
               }
             default:
